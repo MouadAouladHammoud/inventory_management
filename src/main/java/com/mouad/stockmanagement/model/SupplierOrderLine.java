@@ -31,7 +31,7 @@ public class SupplierOrderLine extends AbstractEntity {
     private BigDecimal quantity;
 
     @Column(name = "unit_price")
-    private BigDecimal unit_price;
+    private BigDecimal unitPrice;
 
     @Column(name = "company_id")
     private Integer companyId;

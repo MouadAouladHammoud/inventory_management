@@ -26,7 +26,7 @@ public class Category extends AbstractEntity {
     private String designation;
 
     @Column(name = "company_id")
-    private Integer company_id;
+    private Integer companyId;
 
     // mappedBy = "category" => il doit correspondre exactement au nom de la propriété dans la classe "Product" qui fait référence à la classe "Category"
     // la propriété dans la classe "Product" est nommée "category", donc il faut utiliser "category" comme valeur de mappedBy dans la classe "Category".

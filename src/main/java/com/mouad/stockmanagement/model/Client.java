@@ -42,6 +42,6 @@ public class Client extends AbstractEntity {
     private Integer companyId;
 
     @OneToMany(mappedBy = "client")
-    private List<ClientOrder> ClientOrders;
+    private List<ClientOrder> clientOrders;
 
 }

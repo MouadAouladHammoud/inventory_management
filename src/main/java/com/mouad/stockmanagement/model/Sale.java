@@ -29,7 +29,7 @@ public class Sale extends AbstractEntity {
     private String comment;
 
     @Column(name = "company_id")
-    private Integer company_id;
+    private Integer companyId;
 
     @OneToMany(mappedBy = "sale")
     private List<SaleLine> saleLines;

@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 public class StockMovement extends AbstractEntity {
 
     @Column(name = "movement_date")
-    private Instant movement_date;
+    private Instant movementDate;
 
     @Column(name = "quantity")
     private BigDecimal quantity;
