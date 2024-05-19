@@ -58,5 +58,3 @@ public class Product extends AbstractEntity {
     @OneToMany(mappedBy = "product")
     private List<StockMovement> stockMovements;
 }
-
-// OK
