@@ -27,18 +27,17 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     // @Query: Cette annotation permet de définir une requête personnalisée en utilisant JPQL (Java Persistence Query Language) dans une méthode de repository.
     // findByCustomQuery: C'est le nom de la méthode qui sera utilisé pour invoquer une requête personnalisée.
     // NB: "findByCustomQuery" utilise JPQL (Java Persistence Query Language), une syntaxe similaire au SQL mais spécifique à JPA. Cette requête JPQL est automatiquement transformée en une requête SQL correspondante par le framework de persistance lors de son exécution
-    @Query("SELECT p from Product p WHERE p.code = :code AND p.company_id = :company_id")
+    @Query("SELECT p from Product p WHERE p.productCode = :code AND p.companyId = :company_id")
     List<Product> findByCustomQuery(@Param("code") String c, @Param("company_id") Integer cp);
 
     // @Query: Cette annotation permet de définir une requête personnalisée en utilisant JPQL (Java Persistence Query Language) dans une méthode de repository.
     // findByCustomQuery: C'est le nom de la méthode qui sera utilisé pour invoquer une requête personnalisée.
     // NB: "findByCustomNativeQuery" utilise une requête SQL native, écrite directement en SQL.
-    @Query(value = "SELECT * FROM Product p WHERE p.code = :code AND p.company_id = :company_id", nativeQuery = true)
+    @Query(value = "SELECT * FROM Product p WHERE p.product_code = :code AND p.company_id = :company_id", nativeQuery = true)
     List<Product> findByCustomNativeQuery(@Param("code") String c, @Param("company_id") Integer cp);
 
     // on peut aussi exécuter d'autres méthodes sur l'entité "Category" qui sont déjà définies grâce à "JpaRepository" comme suit :
     // NB: Il se base toujours sur les propriétés du modèle (entité) "Category" pour générer les méthodes prédéfinies, car celui qu'on a utilisé dans l'interface "JpaRepository" => extends JpaRepository<Category, Integer>
     List<Product> findByCodeAndCompanyId(String code, Integer CompanyId);
     List<Product> findByCodeIgnoreCaseAndCompanyId(String code, Integer CompanyId);
-
 }

@@ -5,6 +5,6 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SupplierOrderLineRepository extends JpaRepository<SupplierOrderLine, Integer> {
-    List<SupplierOrderLine> findAllBySupplierOrderId(Integer companyId);
-    List<SupplierOrderLine> findAllByProductId(Integer companyId);
+    List<SupplierOrderLine> findAllBySupplierOrderId(Integer id);
+    List<SupplierOrderLine> findAllByProductId(Integer id);
 }

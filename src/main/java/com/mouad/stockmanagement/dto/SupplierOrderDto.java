@@ -50,4 +50,8 @@ public class SupplierOrderDto {
         supplierOrder.setOrderStatus(dto.getOrderStatus());
         return supplierOrder;
     }
+
+    public boolean isOrderDelivered() {
+        return OrderStatus.DELIVERED.equals(this.orderStatus);
+    }
 }
