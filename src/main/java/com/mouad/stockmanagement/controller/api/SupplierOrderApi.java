@@ -11,8 +11,6 @@ import com.mouad.stockmanagement.dto.SupplierOrderDto;
 import com.mouad.stockmanagement.dto.SupplierOrderLineDto;
 import com.mouad.stockmanagement.model.OrderStatus;
 
-// import io.swagger.annotations.Api;
-
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -24,7 +22,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-// @Api("supplierOrder")
 public interface SupplierOrderApi {
 
     @PostMapping(CREATE_SUPPLIER_ORDER_ENDPOINT)

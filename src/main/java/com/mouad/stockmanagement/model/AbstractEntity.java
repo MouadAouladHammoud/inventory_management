@@ -23,7 +23,7 @@ public class AbstractEntity implements Serializable {
   private Integer id;
 
   @CreatedDate
-  @Column(name = "created_at", nullable = false, updatable = false)
+  @Column(name = "created_at")
   private Instant creationDate;
 
   @LastModifiedDate

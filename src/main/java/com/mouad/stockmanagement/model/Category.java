@@ -2,10 +2,7 @@ package com.mouad.stockmanagement.model;
 
 import java.util.List;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,6 +29,16 @@ public class Category extends AbstractEntity {
     // la propriété dans la classe "Product" est nommée "category", donc il faut utiliser "category" comme valeur de mappedBy dans la classe "Category".
     @OneToMany(mappedBy = "category") // Cette annotation définit une relation "un à plusieurs" entre la classe "Category" et la classe "Product".
     private List<Product> products;
+
+    @PrePersist
+    void prePersist() {
+
+    }
+
+    @PreUpdate
+    void preUpdate() {
+
+    }
 
 }
 

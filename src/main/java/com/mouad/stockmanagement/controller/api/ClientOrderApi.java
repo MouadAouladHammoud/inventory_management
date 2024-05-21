@@ -5,7 +5,7 @@ import static com.mouad.stockmanagement.utils.Constants.APP_ROOT;
 import com.mouad.stockmanagement.dto.ClientOrderDto;
 import com.mouad.stockmanagement.dto.ClientOrderLineDto;
 import com.mouad.stockmanagement.model.OrderStatus;
-// import io.swagger.annotations.Api;
+
 import java.math.BigDecimal;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-// @Api("clientOrders")
 public interface ClientOrderApi {
     @PostMapping(APP_ROOT + "/clientOrder/create")
     ResponseEntity<ClientOrderDto> save(@RequestBody ClientOrderDto dto);
