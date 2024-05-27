@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 import java.util.List;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,7 +51,7 @@ public interface CategoryApi {
     CategoryDto save(@RequestBody CategoryDto dto);
 
     @GetMapping(value = APP_ROOT + "/categories/{categoryId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    CategoryDto findById(@PathVariable("categoryId") Integer categoryId);
+    CategoryDto findById(@PathVariable("categoryId") Integer categoryId, HttpServletRequest request);
 
     @GetMapping(value = APP_ROOT + "/categories/filter/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
     CategoryDto findByCode(@PathVariable("code") String code);

@@ -12,15 +12,17 @@ import com.mouad.stockmanagement.services.CategoryService;
 import com.mouad.stockmanagement.validator.CategoryValidator;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-// @Service : cela permet de définir que cette classe est de type "service" afin d'avoir une instance pour l'injecter dans les classes de contrôleur.
-// NB: On peut utiliser l'annotation @Service avec un nom spécifique : @Service("CategoryServiceImpl1") lorsque on a plusieurs services d'implémentation étendant la classe "CategoryService"
-//   car dans ce cas, nous devons spécifier au contrôleur le service d'implémentation à utiliser dans l'injection pour "CategoryService".
-//   Dans l'application, il n'y a qu'un seul service d'implémentation ("CategoryServiceImpl"), donc il n'est pas nécessaire de nommer le service, car cela est défini automatiquement lors de l'injection d'une instance de "CategoryService" dans le contrôleur.
+// @Service : permet de définir cette classe comme un service, ce qui permet à Spring de créer une instance de cette classe pour l'injecter dans les contrôleurs et autres composants
+// NB: On peut utiliser l'annotation @Service avec un nom spécifique : @Service("CategoryServiceImpl1") lorsque on a plusieurs implémentations du service étendant la meme classe "CategoryService"
+//   car dans ce cas, on doit spécifier au contrôleur (CategoryController.java) quelle implémentation du service à utiliser pour l'injection de "CategoryService".
+//   Dans l'application, il n'y a qu'une seule implémentation de service ("CategoryServiceImpl.java"), donc il n'est pas nécessaire de nommer le service, car cela est défini automatiquement lors de l'injection d'une instance de "CategoryService" dans le contrôleur.
 @Service
 @Slf4j // utilisé pour générer des logs.
 public class CategoryServiceImpl implements CategoryService {
@@ -46,7 +48,18 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryDto findById(Integer id) {
+    public CategoryDto findById(Integer id, Integer userId) {
+        System.out.println("**** From CategoryServiceImpl ****");
+        System.out.println("**************************************************************************************");
+        System.out.println("**************************************************************************************");
+        System.out.println("userId : " + userId);
+
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        System.out.println("email : " + email);
+
+        System.out.println("**************************************************************************************");
+        System.out.println("**************************************************************************************");
+
         if (id == null) {
             log.error("Category ID is null");
             return null;
