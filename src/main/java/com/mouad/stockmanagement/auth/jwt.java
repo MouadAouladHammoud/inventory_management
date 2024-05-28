@@ -1,5 +1,6 @@
 package com.mouad.stockmanagement.auth;
 
+import com.mouad.stockmanagement.token.TokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -97,6 +98,7 @@ public class jwt {
 
         private final JwtService jwtService;
         private final UserDetailsService userDetailsService;
+        private final TokenRepository tokenRepository;
 
         @Override
         protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -113,10 +115,19 @@ public class jwt {
             jwt = authHeader.substring(7);
             userEmail = jwtService.extractUsername(jwt);
 
+            // Cette condition vérifie deux choses :
+            //   Que l'email de l'utilisateur a bien été extrait du token (userEmail != null)
+            //   Et que l'utilisateur n'est pas déjà authentifié dans le contexte de sécurité de Spring
+            // NB: Cette vérification empêche de ré-authentifier un utilisateur qui est déjà authentifié dans le contexte de sécurité courant.
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
-                if (jwtService.isTokenValid(jwt, userDetails)) {
+                // vérifie que le token n'est ni expiré (isExpired()) ni révoqué (isRevoked()).
+                var isTokenValid = tokenRepository.findByToken(jwt)
+                        .map(t -> !t.isExpired() && !t.isRevoked())
+                        .orElse(false);
+
+                if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,null, userDetails.getAuthorities());
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);

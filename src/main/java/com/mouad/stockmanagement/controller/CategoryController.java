@@ -39,11 +39,11 @@ public class CategoryController implements CategoryApi {
     */
 
     /*
-    // L'injection dans le cas où plusieurs implémentations de services étendent le même service :
-    // Supposons que nous ayons plusieurs implémentations de services ("CategoryServiceImpl1" et "CategoryServiceImpl2") qui étendent le même service ("CategoryService").
+    // L'injection dans le cas où plusieurs implémentations de services étendent la meme interface "CategoryService" :
+    // Supposons que nous ayons plusieurs implémentations de services ("CategoryServiceImpl1" et "CategoryServiceImpl2") qui étendent le même interface de service ("CategoryService").
     //   Ici, il est nécessaire de spécifier quel service d'implémentation parmi les deux doit être injecté pour le "categoryService".
     //   C'est pourquoi nous avons dû ajouter une annotation @Qualifier pour spécifier quel service d'implémentation doit être injecté et utilisé.
-    // S'il n'y a qu'un seul service d'implémentation disponible pour "categoryService", alors dans ce cas, il n'est pas nécessaire d'utiliser l'annotation @Qualifier, le service d'implémentation sera automatiquement déterminé
+    // S'il n'y a qu'un seul service d'implémentation disponible pour l'interface de "categoryService", alors dans ce cas, il n'est pas nécessaire d'utiliser l'annotation @Qualifier, le service d'implémentation sera automatiquement déterminé
     @Autowired
     @Qualifier("CategoryServiceImpl1") // Dans ce contrôleur, j'ai choisi "CategoryServiceImpl1" pour l'utiliser dans "categoryService".
     private CategoryService categoryService;

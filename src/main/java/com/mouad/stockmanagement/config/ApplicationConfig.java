@@ -61,7 +61,7 @@ public class ApplicationConfig {
     // Cette méthode prend en paramètre une variable "username" qui récupère dans notre cas l'email de l'utilisateur (mais cela peut être le nom, l'ID ou l'email, selon lequel baseé sur l'identification des utilisateurs).
     //   Elle recherche ensuite dans le "UserRepository" l'utilisateur correspondant par son email.
     //   Si aucun utilisateur n'est trouvé, une exception "UsernameNotFoundException" est levée
-    // @Bean
+    @Bean
     public UserDetailsService userDetailsService() {
         return username -> userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }

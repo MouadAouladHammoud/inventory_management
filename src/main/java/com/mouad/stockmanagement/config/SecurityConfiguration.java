@@ -16,7 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
-// import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 
 @Configuration // Indique que cette classe fournit une configuration pour l'application Spring qui doit être prise en charge lors du démarrage du serveur.
 @RequiredArgsConstructor
@@ -38,7 +38,7 @@ public class SecurityConfiguration {
             "/swagger-ui.html"};
     private final jwt.JwtAuthenticationFilter jwtAuthFilter; // Une instance de la class "JwtAuthenticationFilter" pour verifier la validité de JWT provenant des requetes HTTP.
     private final AuthenticationProvider authenticationProvider; // Cet instance de "AuthenticationProvider" qui est initialisé dans "ApplicationConfig.java" et est utilisé pour verifier l'authentification de utilisateur courant avec la BD.
-    // private final LogoutHandler logoutHandler;
+    private final LogoutHandler logoutHandler;
 
     // Cette méthode crée un Bean "SecurityFilterChain" qui configure les filtres de sécurité pour l'application.
     // NB: Cette méthode est appliquée à chaque requête entrante dans l'application.
@@ -52,7 +52,16 @@ public class SecurityConfiguration {
             )
             .sessionManagement(session -> session.sessionCreationPolicy(STATELESS)) // Configure la gestion des sessions pour être sans état (stateless), ce qui signifie que l'application n'utilise pas de session HTTP pour stocker l'état de l'utilisateur.
             .authenticationProvider(authenticationProvider) // spécifier comment l'authentification des utilisateurs doit être gérée.
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class); // ici on a configuré que le filtre "jwtAuthFilter" soit être exécuté avant le filtre "UsernamePasswordAuthenticationFilter" :
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class) // ici on a configuré que le filtre "jwtAuthFilter" soit être exécuté avant le filtre "UsernamePasswordAuthenticationFilter" :
+            .logout(logout -> // ici pour configurer deconnexion d'un utilisateur
+                logout.logoutUrl("/api/v1/auth/logout")
+                        // NB: "LogoutHandler" c'est une interface, mais puise que on a implementé cette interface par un service "LogoutService.java"
+                        // NB: "LogoutHandler" est une interface, mais comme on a implémenté cette interface dans le service "LogoutService.java", alors ici, le service "LogoutService.java" est utilisé ici automatiquement.
+                        //    C'est le même exemple pour le contrôleur "CategoryController.java", qui injecte le service "CategoryServiceImpl.java" le seul qui implémente l'interface "CategoryService.java".
+                        //    Dans le contrôleur "CategoryController.java", on trouve : private final CategoryService categoryService;
+                        .addLogoutHandler(logoutHandler)
+                        .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext()));
+
                 // *** Scénario d'une requête de l'utilisateur déjà connecté :
                 // 1 - L'utilisateur envoie une requête à l'application avec un Token d'authentification valide inclus dans Header de la requête.
                 // 2 - Le filtre "jwtAuthFilter" (qu'on a configuré pour gérer l'authentification basée sur le Token JWT dans le fichier: JwtAuthenticationFilter.java) est exécuté en premier, car il est configuré pour être exécuté avant le filtre "UsernamePasswordAuthenticationFilter".
@@ -66,13 +75,6 @@ public class SecurityConfiguration {
                 // 2 - La requête est interceptée par "UsernamePasswordAuthenticationFilter".
                 // 3 - "UsernamePasswordAuthenticationFilter" délègue la tâche à Bean "AuthenticationProvider" qui est déja préconfiguré dans ApplicationConfig.java pour verifier les donnés dans la base de donnée.
                 // 4 - si l'utilisateur authentifié avec succès, un Token d'authentification sera généré pour l'utilisateur.
-
-                /*
-                .logout(logout ->
-                        logout.logoutUrl("/api/v1/auth/logout")
-                                .addLogoutHandler(logoutHandler)
-                                .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext()));
-                 */
 
         return http.build();
     }

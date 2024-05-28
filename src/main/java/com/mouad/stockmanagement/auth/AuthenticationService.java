@@ -4,6 +4,9 @@ import com.mouad.stockmanagement.model.UserRole;
 import com.mouad.stockmanagement.model.User;
 import com.mouad.stockmanagement.repository.UserRepository;
 
+import com.mouad.stockmanagement.token.Token;
+import com.mouad.stockmanagement.token.TokenRepository;
+import com.mouad.stockmanagement.token.TokenType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,7 +20,7 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final jwt.JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-
+    private final TokenRepository tokenRepository;
 
     // Dans cet exemple, nous injectons par défaut ces Beans de type String (test et test3) qui sont déjà prédéfinis dans "ApplicationConfig.java" dans la fonction "test_()".
     // Spring Boot prend en considération le type de méthode déclarée, qui dans cet exemple est de type "String" (dans le fichier ApplicationConfig.java: @Bean public String test_() { ... }).
@@ -35,9 +38,11 @@ public class AuthenticationService {
             .password(passwordEncoder.encode(request.getPassword()))
             .userRole(UserRole.USER)
             .build();
-        repository.save(user);
+        var userSaved = repository.save(user);
+        var jwtToken = jwtService.generateToken(user, userSaved.getId()); // appeller une méthode sur le "jwtService" pour générer un Token JWT pour l'utilisateur trouvé.
 
-        var jwtToken = jwtService.generateToken(user, user.getId()); // appeller une méthode sur le "jwtService" pour générer un Token JWT pour l'utilisateur trouvé.
+        saveTokenForUser(userSaved, jwtToken); // Enregistrer le token de l'utilisateur dans la base de données
+
         return AuthenticationResponse.builder() // construire et retourne une réponse contenant le JWT pour l'envoyer au client.
                 .token(jwtToken)
                 .build();
@@ -67,9 +72,35 @@ public class AuthenticationService {
 
         var user = repository.findByEmail(request.getEmail()).orElseThrow();
         var jwtToken = jwtService.generateToken(user, user.getId()); // appeller une méthode sur le "jwtService" pour générer un Token JWT pour l'utilisateur trouvé.
+
+        revokeAllUserTokens(user); // Invalider les autres tokens qui sont liés à l'utilisateur concerné.
+        saveTokenForUser(user, jwtToken); // Enregistrer un nouveau token pour l'utilisateur concerné.
+
         System.out.println(test3); // Output: Hy !! 1
         return AuthenticationResponse.builder() // construire et retourne une réponse contenant le JWT pour l'envoyer au client.
                 .token(jwtToken)
                 .build();
+    }
+
+    private void saveTokenForUser(User user, String jwtToken) {
+        var token = Token.builder()
+                .user(user)
+                .token(jwtToken)
+                .tokenType(TokenType.BEARER)
+                .revoked(false)
+                .expired(false)
+                .build();
+        tokenRepository.save(token);
+    }
+
+    private void revokeAllUserTokens(User user) {
+        var validUserTokens = tokenRepository.findAllValidTokenByUser(user.getId());
+        if (validUserTokens.isEmpty())
+            return;
+        validUserTokens.forEach(token -> {
+            token.setExpired(true);
+            token.setRevoked(true);
+        });
+        tokenRepository.saveAll(validUserTokens);
     }
 }
