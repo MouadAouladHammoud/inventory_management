@@ -36,7 +36,7 @@ public class AuthenticationService {
             .lastName(request.getLastname())
             .email(request.getEmail())
             .password(passwordEncoder.encode(request.getPassword()))
-            .userRole(UserRole.USER)
+            .userRole(request.getUserRole())
             .build();
         var userSaved = repository.save(user);
         var jwtToken = jwtService.generateToken(user, userSaved.getId()); // appeller une méthode sur le "jwtService" pour générer un Token JWT pour l'utilisateur trouvé.

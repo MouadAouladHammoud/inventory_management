@@ -120,7 +120,8 @@ public class jwt {
             //   Et que l'utilisateur n'est pas déjà authentifié dans le contexte de sécurité de Spring
             // NB: Cette vérification empêche de ré-authentifier un utilisateur qui est déjà authentifié dans le contexte de sécurité courant.
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+                // charger les détails de l'utilisateur à partir de la base de données
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail); // voir Bean "UserDetailsService" dans le fichier "ApplicationConfig.java"
 
                 // vérifie que le token n'est ni expiré (isExpired()) ni révoqué (isRevoked()).
                 var isTokenValid = tokenRepository.findByToken(jwt)
@@ -128,7 +129,7 @@ public class jwt {
                         .orElse(false);
 
                 if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,null, userDetails.getAuthorities());
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,null, userDetails.getAuthorities()); //
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
