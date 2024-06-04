@@ -18,3 +18,11 @@ spring:
 
 server:
   port: 8801
+
+application:
+  security:
+    jwt:
+      secret-key: 449e389b00ceb8880a8e64916a87dbe349f603890bcab1a98fb1729109cb83f9
+      expiration: 61200 # 1 min
+      refresh-token:
+        expiration: 604800000 # 7 days

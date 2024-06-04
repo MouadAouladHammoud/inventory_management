@@ -11,6 +11,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,7 +34,14 @@ public class jwt {
     @Service
     public static class JwtService {
 
-        private static final String SECRET_KEY = "449e389b00ceb8880a8e64916a87dbe349f603890bcab1a98fb1729109cb83f9";
+        @Value("${application.security.jwt.secret-key}")
+        private String secretKey;
+
+        @Value("${application.security.jwt.expiration}")
+        private long jwtExpiration;
+
+        @Value("${application.security.jwt.refresh-token.expiration}")
+        private long refreshExpiration;
 
         public String extractUsername(String token) {
             return extractClaim(token, Claims::getSubject);
@@ -53,13 +61,29 @@ public class jwt {
                 UserDetails userDetails,
                 Integer userId
         ) {
+            return buildToken(extraClaims, userDetails, userId, jwtExpiration);
+        }
+
+        public String generateRefreshToken(
+                UserDetails userDetails,
+                Integer userId
+        ) {
+            return buildToken(new HashMap<>(), userDetails, userId, refreshExpiration);
+        }
+
+        private String buildToken(
+            Map<String, Object> extraClaims,
+            UserDetails userDetails,
+            Integer userId,
+            long expiration
+        ) {
             return Jwts
                 .builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .claim("userId", userId) // Ajouter l'ID de l'utilisateur comme une revendication supplémentaire
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 10000 * 60 * 24))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
         }
@@ -87,7 +111,7 @@ public class jwt {
         }
 
         private Key getSignInKey() {
-            byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+            byte[] keyBytes = Decoders.BASE64.decode(secretKey);
             return Keys.hmacShaKeyFor(keyBytes);
         }
     }
