@@ -22,7 +22,10 @@ public class CategoryDto {
     private String designation;
     private Integer companyId;
 
-    @JsonIgnore // indique que cette propriété ne sera pas sérialisée lors de la conversion de l'objet en JSON (API).
+    // @JsonIgnore : indique que la propriété annotée doit être ignorée lors de la sérialisation ou de la désérialisation JSON.
+    //   Autrement dit, quand un objet de cette classe est converti en JSON, cette propriété ne sera pas incluse dans le résultat JSON.
+    //   Inversement, quand un JSON est converti en objet Java, cette propriété ne sera pas initialisée à partir du JSON.
+    @JsonIgnore
     private List<ProductDto> articles; // Une liste des produits associés à cette catégorie.
 
     // fromEntity(Category category) : Méthode statique permettant de convertir une entité "Category" en un objet "CategoryDto".

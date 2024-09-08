@@ -70,7 +70,8 @@ public class SecurityConfiguration {
     private final LogoutHandler logoutHandler;
 
     // Cette méthode crée un Bean "SecurityFilterChain" qui configure les filtres de sécurité pour l'application.
-    // NB: Cette méthode est appliquée à chaque requête entrante dans l'application.
+    // NB: Cette méthode est appliquée à chaque requête HTTP entrante dans l'application.
+    //     Ce filtre de sécurité analyse la requête et applique les configurations de sécurité appropriées (authentification, autorisation, etc.) avant que la requête n'atteigne les contrôleurs de l'application.
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable) // Désactive la protection contre les attaques CSRF (Cross-Site Request Forgery) dans la configuration HTTP.
@@ -97,8 +98,15 @@ public class SecurityConfiguration {
                 .anyRequest()
                 .authenticated()
             )
-            .sessionManagement(session -> session.sessionCreationPolicy(STATELESS)) // Configure la gestion des sessions pour être sans état (stateless), ce qui signifie que l'application n'utilise pas de session HTTP pour stocker l'état de l'utilisateur.
+
+            // NB: Ce mode indique que l'application est "stateless" (sans état). Autrement dit, chaque requête HTTP est indépendante et ne dépend pas d'une session serveur stockée.
+            //     Les API RESTful sont conçues pour être sans état (stateless). Cela signifie que chaque requête doit contenir toutes les informations nécessaires pour être traitée, sans dépendre de l'état du serveur (comme une session HTTP)
+            //     il s'agit lorsque vous utilisez des Tokens pour l'authentification, il n'est pas nécessaire de stocker l'état d'un utilisateur sur le serveur. Au lieu de cela, chaque requête du client contient le token qui est utilisé pour vérifier l'identité de l'utilisateur.
+            .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
+
+            // NB: "authenticationProvider": Cette option dit essentiellement à Spring Security de ne pas utiliser le fournisseur d'authentification par défaut, mais plutôt celui que tu as configuré avec tes propres règles (UserDetailsService, PasswordEncoder, etc.).
             .authenticationProvider(authenticationProvider) // spécifier comment l'authentification des utilisateurs doit être gérée.
+
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class) // ici on a configuré que le filtre "jwtAuthFilter" soit être exécuté avant le filtre "UsernamePasswordAuthenticationFilter" :
             .logout(logout -> // ici pour configurer deconnexion d'un utilisateur
                 logout.logoutUrl("/api/v1/auth/logout")

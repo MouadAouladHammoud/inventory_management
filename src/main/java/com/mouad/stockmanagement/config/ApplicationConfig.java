@@ -61,6 +61,7 @@ public class ApplicationConfig {
     // Cette méthode prend en paramètre une variable "username" qui récupère dans notre cas l'email de l'utilisateur (mais cela peut être le nom, l'ID ou l'email, selon lequel baseé sur l'identification des utilisateurs).
     //   Elle recherche ensuite dans le "UserRepository" l'utilisateur correspondant par son email.
     //   Si aucun utilisateur n'est trouvé, une exception "UsernameNotFoundException" est levée
+    // NB: Dans cette fonction "UserDetailsService", vous implémentez la méthode "loadUserByUsername" en utilisant une expression lambda. Le paramètre "username" est automatiquement passé par Spring Security lorsque quelqu'un essaie de s'authentifier.
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
@@ -82,6 +83,9 @@ public class ApplicationConfig {
     // Cette méthode Bean est implémentée pour créer un objet "authProvider" de type "DaoAuthenticationProvider", en lui fournissant le Bean "UserDetailsService" pour rechercher l'utilisateur concerné et un type d'encodage (PasswordEncoder) pour encoder le mot de passe donné.
     //   L'objet "authProvider" utilise ici le Bean "UserDetailsService" pour récupérer les détails de l'utilisateur et vérifier le mot de passe. Notons que la récupération des détails de l'utilisateur concerné se fait en se basant sur son adresse email.
     //   ce provider d'authentification "authProvider" est implémenté dans la fonction "SecurityFilterChain" du fichier "SecurityConfiguration.java" afin qu'il soit exécuté pour chaque requête reçue.
+    // NB: authenticationProvider est effectivement utilisé de deux manières différentes :
+    //   - Indirectement via "AuthenticationManager" dans authenticationManager(AuthenticationConfiguration config), où Spring Security utilise automatiquement tous les beans de configuration pour construire le "AuthenticationManager".
+    //   - Directement dans ta configuration "SecurityFilterChain" pour spécifier exactement quel "AuthenticationProvider" utiliser lors de l'authentification des utilisateurs. (voir le fichier: SecurityConfiguration.java)
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -95,6 +99,12 @@ public class ApplicationConfig {
 
 
     // À l'intérieur de cette méthode, elle appelle la méthode getAuthenticationManager() de "AuthenticationConfiguration" pour exécuter la fonction "authenticate()" avec l'email et le mot de passe d'un utilisateur afin de vérifier l'authentification de cet utilisateur. (voir le fichier : AuthenticationService.java).
+    // Lors du démarrage de l'application, "AuthenticationConfiguration" scanne le contexte Spring pour trouver tous les beans nécessaires à l'authentification. Il identifie:
+    //   1 - Le UserDetailsService pour savoir comment récupérer les informations des utilisateurs.
+    //   2 - Le PasswordEncoder pour savoir comment vérifier les mots de passe.
+    //   3 - L'AuthenticationProvider qui encapsule la logique d'authentification.
+    // Le paramètre "config" de type "AuthenticationConfiguration" ici contient des références aux beans de ta configuration, comme "UserDetailsService", "PasswordEncoder", et "AuthenticationProvider", et il les utilise pour construire un AuthenticationManager prêt à l'emploi.
+    // NB: cette Bean n'utilise que dans login (Connexion de l'utilisateur)
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();

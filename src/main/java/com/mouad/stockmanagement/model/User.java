@@ -56,6 +56,7 @@ public class User extends AbstractEntity implements UserDetails {
     @OneToMany(mappedBy = "user")
     private List<Token> tokens;
 
+    // Remarque importante: La fonction getAuthorities() s'exécute chaque fois qu'un objet User est utilisé depuis d'autres classes (par exemple, lors de la récupération des ventes avec les utilisateurs associés).
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return userRole.getAuthorities();
